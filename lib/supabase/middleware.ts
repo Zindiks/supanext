@@ -1,23 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { hasEnvVars } from '../utils'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
 
-  // If the env vars are not set, skip proxy check. You can remove this
-  // once you setup the project.
-  if (!hasEnvVars()) {
-    return supabaseResponse
-  }
-
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -48,7 +41,6 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims
 
   if (
-    request.nextUrl.pathname !== '/' &&
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth')
@@ -56,17 +48,6 @@ export async function updateSession(request: NextRequest) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
-  }
-
-  // if user is signed in and the current path is /auth redirect the user to /protected
-  if (
-    user &&
-    request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/auth/callback')
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/protected'
     return NextResponse.redirect(url)
   }
 

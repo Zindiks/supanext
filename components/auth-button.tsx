@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { Button } from "./ui/button";
-import { createClient } from "@/lib/supabase/server";
+import Link from 'next/link'
+import { Button } from './ui/button'
+import { createClient } from '@/lib/supabase/server'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,39 +8,45 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { signOut } from "@/app/auth/actions";
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { signOut } from '@/app/auth/actions'
 
 export async function AuthButton() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return (
       <div className="flex gap-2">
-        <Button asChild size="sm" variant={"outline"}>
+        <Button asChild size="sm" variant={'outline'}>
           <Link href="/auth/login">Sign in</Link>
         </Button>
-        <Button asChild size="sm" variant={"default"}>
+        <Button asChild size="sm" variant={'default'}>
           <Link href="/auth/sign-up">Sign up</Link>
         </Button>
       </div>
-    );
+    )
   }
 
-  const name = user.user_metadata?.full_name || user.user_metadata?.user_name || user.email?.split("@")[0] || "User";
-  const email = user.email || "";
-  const avatarUrl = user.user_metadata?.avatar_url || "";
+  const name =
+    user.user_metadata?.full_name ||
+    user.user_metadata?.user_name ||
+    user.email?.split('@')[0] ||
+    'User'
+  const email = user.email || ''
+  const avatarUrl = user.user_metadata?.avatar_url || ''
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
-      .substring(0, 2);
-  };
+      .substring(0, 2)
+  }
 
   return (
     <DropdownMenu>
@@ -73,5 +79,5 @@ export async function AuthButton() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

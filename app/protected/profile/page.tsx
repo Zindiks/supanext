@@ -1,37 +1,47 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Suspense } from "react";
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Suspense } from 'react'
 
 async function ProfileContent() {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
 
   if (error || !user) {
-    redirect("/auth/login");
+    redirect('/auth/login')
   }
 
   // Extract user details
-  const name = user.user_metadata?.full_name || user.user_metadata?.user_name || "User";
-  const email = user.email || "";
-  const avatarUrl = user.user_metadata?.avatar_url || "";
-  const providers = user.app_metadata?.providers || [];
-  const preferredUsername = user.user_metadata?.preferred_username || "";
+  const name =
+    user.user_metadata?.full_name || user.user_metadata?.user_name || 'User'
+  const email = user.email || ''
+  const avatarUrl = user.user_metadata?.avatar_url || ''
+  const providers = user.app_metadata?.providers || []
+  const preferredUsername = user.user_metadata?.preferred_username || ''
 
   // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
-      .substring(0, 2);
-  };
+      .substring(0, 2)
+  }
 
   return (
     <div className="grid gap-6 md:grid-cols-[250px_1fr]">
@@ -39,10 +49,14 @@ async function ProfileContent() {
         <CardHeader className="items-center text-center">
           <Avatar className="h-24 w-24 mb-4">
             <AvatarImage src={avatarUrl} alt={name} />
-            <AvatarFallback className="text-2xl">{getInitials(name)}</AvatarFallback>
+            <AvatarFallback className="text-2xl">
+              {getInitials(name)}
+            </AvatarFallback>
           </Avatar>
           <CardTitle>{name}</CardTitle>
-          <CardDescription>{preferredUsername ? `@${preferredUsername}` : email}</CardDescription>
+          <CardDescription>
+            {preferredUsername ? `@${preferredUsername}` : email}
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-wrap gap-2 justify-center">
@@ -67,7 +81,7 @@ async function ProfileContent() {
             <Label htmlFor="email">Email</Label>
             <Input id="email" value={email} disabled readOnly />
           </div>
-          
+
           <div className="grid gap-2">
             <Label htmlFor="name">Full Name</Label>
             <Input id="name" value={name} disabled readOnly />
@@ -76,18 +90,29 @@ async function ProfileContent() {
           {preferredUsername && (
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" value={preferredUsername} disabled readOnly />
+              <Input
+                id="username"
+                value={preferredUsername}
+                disabled
+                readOnly
+              />
             </div>
           )}
 
           <div className="grid gap-2">
             <Label htmlFor="uid">User ID</Label>
-            <Input id="uid" value={user.id} disabled readOnly className="font-mono text-xs" />
+            <Input
+              id="uid"
+              value={user.id}
+              disabled
+              readOnly
+              className="font-mono text-xs"
+            />
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 export default function ProfilePage() {
@@ -104,5 +129,5 @@ export default function ProfilePage() {
         <ProfileContent />
       </Suspense>
     </div>
-  );
+  )
 }
